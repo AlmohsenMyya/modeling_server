@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import ' widgets/inputs_dialogs.dart';
 import '../controllers/simulation_controller.dart';
+import 'info_screen.dart';
 
 class SimulationScreen extends StatelessWidget {
   @override
@@ -11,44 +13,60 @@ class SimulationScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Single Server Queue Simulation'),
+        title: Row(
+          children: [
+            Text('Single Server Queue Simulation' , style: TextStyle(fontSize: 18),),
+            Spacer(),
+            IconButton(
+              icon: Icon(Icons.info_outline),
+              onPressed: () {
+                Get.to(DevelopersPage());
+              },
+            )
+          ],
+        ),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         } else {
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: controller.results.isEmpty
                 ? Center(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
+                          onLongPress: () =>
+                              showInputDialog(context, controller),
                           onPressed: controller.runSimulationSet,
                           child: const Text('Run Simulations'),
                         ),
-                        const SizedBox(height: 20),
-                        const Text('No results yet.')
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text('No results yet.'),
                       ],
                     ),
                   )
                 : Column(
                     children: [
                       ElevatedButton(
+                        onLongPress: () => showInputDialog(context, controller),
                         onPressed: controller.runSimulationSet,
                         child: const Text('Rerun Simulations'),
                       ),
-                      const SizedBox(height: 20),
                       Expanded(
                         child: ListView.builder(
                           itemCount: controller.results.length,
                           itemBuilder: (context, index) {
+
                             final result = controller.results[index];
                             final data = result["result"];
+                            // print(data);
                             return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              margin: EdgeInsets.symmetric(vertical: 10),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
@@ -56,10 +74,10 @@ class SimulationScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       'Inter-Arrival Time: ${result["interArrival"]}, Service Time: ${result["service"]}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    const SizedBox(height: 10),
+                                    SizedBox(height: 10),
                                     Text(
                                         'Number of customers entered: ${data["customerCount"]}'),
                                     Text(
